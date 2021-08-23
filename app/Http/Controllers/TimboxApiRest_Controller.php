@@ -15,7 +15,7 @@ class TimboxApiRest_Controller extends Controller
             
             // Get Api Key
             // ( user, password )
-            $response = ApiRest::buscarAcuse('PIRD9607262M7','cr1xNPuHyYGnSTgJ5uVx');
+            $response = ApiRest::buscarAcuse('user','password');
 
             // Buscar Acuse
             echo $response;
@@ -30,7 +30,7 @@ class TimboxApiRest_Controller extends Controller
             
             // Get Api Key
             // ( user, password )
-            $response = ApiRest::buscarCfdi('PIRD9607262M7','cr1xNPuHyYGnSTgJ5uVx');
+            $response = ApiRest::buscarCfdi('user','password');
             
             echo $response;
 
@@ -44,7 +44,7 @@ class TimboxApiRest_Controller extends Controller
             
             // Get Api Key
             // ( user, password )
-            $response = ApiRest::consultaLco('PIRD9607262M7','cr1xNPuHyYGnSTgJ5uVx');
+            $response = ApiRest::consultaLco('user','password');
             
             echo $response;
 
@@ -58,7 +58,7 @@ class TimboxApiRest_Controller extends Controller
             
             // Get Api Key
             // ( user, password )
-            $response = ApiRest::consultaRfc('PIRD9607262M7','cr1xNPuHyYGnSTgJ5uVx');
+            $response = ApiRest::consultaRfc('user','password');
             
             echo $response;
 
@@ -72,7 +72,7 @@ class TimboxApiRest_Controller extends Controller
             
             // Get Api Key
             // ( user, password )
-            $response = ApiRest::obtenerConsumo('PIRD9607262M7','cr1xNPuHyYGnSTgJ5uVx');
+            $response = ApiRest::obtenerConsumo('user','password');
             
             echo $response;
 
@@ -86,7 +86,7 @@ class TimboxApiRest_Controller extends Controller
             
             // Get Api Key
             // ( user, password )
-            $response = ApiRest::timbrarCfdi('PIRD9607262M7','cr1xNPuHyYGnSTgJ5uVx');
+            $response = ApiRest::timbrarCfdi('user','password');
             
             echo $response;
 
