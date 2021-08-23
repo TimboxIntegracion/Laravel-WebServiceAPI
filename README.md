@@ -1,62 +1,230 @@
 <p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400"></a></p>
 
-<p align="center">
-<a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+<h1 align:="center">Integración Laravel - Timbox Web Service API REST</h1>
 
-## About Laravel
+<p> En el presente documento se encuentra la documentación correspondiente a los snippets de código desarrollados utilizando el framework Laravel v8.5 así como también las librerías externas utilizadas para realizar las solicitudes HTTP correspondientes a la API REST del proyecto de Web Service de Timbox.</p>
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+<p>Los métodos desarrollados son los siguientes:</p>
+<ul>
+    <li>timbrar_cfdi</li>
+    <li>buscar_cfdi</li>
+    <li>buscar_acuses</li>
+    <li>recuperar_comprobante</li>
+    <li>obtener_consumo</li>
+    <li>consulta_lco</li>
+    <li>consulta_lrfc</li>
+</ul> 
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+<p> Para realizar las solicitudes HTTP en laravel debe agregarse la siguiente línea: </p>
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+```
+use Illuminate\Support\Facades\Http;
+```
+<h4>Autenticación Básica:</h4>
 
-## Learning Laravel
+<p>Se requiere generar una API-KEY para poder hacer peticiones al servicio, por lo que deben proporcionar las credenciales requeridas, usuario y contraseña del dashboard de Timbox.</p>
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+URL de autenticación: https://staging.ws.timbox.com.mx/api/auth
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 1500 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+<p>LLamando la siguiente función regresará un objeto del cual se puede extraer la API KEY.</p>
 
-## Laravel Sponsors
+```
+private static function getApiKey($user, $password){
+       try {
+           return Http::withBasicAuth($user, $password)->get('https://staging.ws.timbox.com.mx/api/auth');
+       } catch (\Throwable $th) {
+           throw $th;
+       }
+   }
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+<p>Todos los métodos siguientes se encuentran en app/models/ApiRest.php</p>
 
-### Premium Partners
+<h4>Método Buscar_Acuse:</h4>
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
+```
+public static function buscarAcuse($user, $password){
+       try {
+           // Get Api Key
+           $auth = ApiRest::getApiKey($user, $password);
+           $APIKEY = $auth['api_key'];
 
-## Contributing
+           // Parámetros
+           //  - Arreglo de UUIDs
+           $uuid = "12345X12-0BEF-4919-9B44-7F8BFE44D451, 4455B22-56EF-4849-9B33-7F8GDR44F498";
+           $params = "?parametros_acuse[uuids][uuid][]=".$uuid;
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+           // Buscar Acuse
+           $res = Http::withHeaders([
+               'x-api-key' => $APIKEY
+           ])->get('https://staging.ws.timbox.com.mx/api/buscar_acuse_recepcion'.$params);
+          
+           // Respuesta
+           echo $res;
 
-## Code of Conduct
+       } catch (\Throwable $th) {
+           throw $th;
+       }
+   }
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+<h4>Método Buscar_CFDI:</h4>
 
-## Security Vulnerabilities
+```
+public static function buscarCfdi($user, $password){
+       try {
+           // Get Api Key
+           $auth = ApiRest::getApiKey($user, $password);
+           $APIKEY = $auth['api_key'];
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+           // Parámetros
+           $uuid = "44235C12-0BEF-4919-9B44-7F8BFE44D451";
+           $params = "?parametros_cfdis[uuid]=".$uuid;
 
-## License
+           // Buscar Acuse
+           $res = Http::withHeaders([
+               'x-api-key' => $APIKEY
+           ])->get('https://staging.ws.timbox.com.mx/api/buscar_cfdi'.$params);
+          
+           // Respuesta
+           echo $res;
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+       } catch (\Throwable $th) {
+           throw $th;
+       }
+   }
+```
+
+<h4>Método Obtener_Consumo:</h4>
+
+```
+public static function obtenerConsumo($user, $password){
+       try {   
+           // Get Api Key
+           $auth = ApiRest::getApiKey($user, $password);
+           $APIKEY = $auth['api_key'];
+           // Buscar Acuse
+           $res = Http::withHeaders([
+               'x-api-key' => $APIKEY,
+               'Content-Type' => "application/json"
+           ])->get('https://staging.ws.timbox.com.mx/api/obtener_consumo');
+           
+           // Respuesta
+           echo $res;
+
+       } catch (\Throwable $th) {
+           throw $th;
+       }
+   }
+```
+
+<h4>Método Recuperar_Comprobante:</h4>
+
+```
+public static function recuperarComprobante($user, $password){
+       try {   
+           // Get Api Key
+           $auth = ApiRest::getApiKey($user, $password);
+           $APIKEY = $auth['api_key'];
+           // Buscar Acuse
+           $res = Http::withHeaders([
+               'x-api-key' => $APIKEY,
+               'Content-Type' => "application/json"
+           ])->get('https://staging.ws.timbox.com.mx/api/recuperar_comprobante');
+           
+           // Respuesta
+           echo $res;
+
+       } catch (\Throwable $th) {
+           throw $th;
+       }
+   }
+```
+
+<h4>Método Consulta_RFC:</h4>
+
+```
+public static function consultaRfc($user, $password){
+       try {   
+           // Get Api Key
+           $auth = ApiRest::getApiKey($user, $password);
+           $APIKEY = $auth['api_key'];
+           // Parámetros
+           $rfc = "?rfc=ROPS670907FU1";
+
+           $params = $rfc;
+            // Buscar Acuse
+            $res = Http::withHeaders([
+                'x-api-key' => $APIKEY
+            ])->get('https://staging.ws.timbox.com.mx/api/consulta_rfc'.$params);
+           
+            // Respuesta
+            echo $res;
+
+       } catch (\Throwable $th) {
+           throw $th;
+       }
+   }
+```
+
+<h4>Método Consulta_LCO:</h4>
+
+```
+public static function consultaLco($user, $password){
+       try {   
+           // Get Api Key
+           $auth = ApiRest::getApiKey($user, $password);
+           $APIKEY = $auth['api_key'];
+           // Parámetros
+           $rfc = "?rfc=ROPS670907FU1";
+           $n_cert = "no_certificado=00001000000407219892";
+
+           $params = $rfc."&".$n_cert;
+            // Buscar Acuse
+            $res = Http::withHeaders([
+                'x-api-key' => $APIKEY
+            ])->get('https://staging.ws.timbox.com.mx/api/consulta_lco'.$params);
+           
+            // Respuesta
+            echo $res;
+
+       } catch (\Throwable $th) {
+           throw $th;
+       }
+   }
+```
+<h4>Método Timbrar_CFDI:</h4>
+
+```
+public static function timbrarCfdi($user, $password){
+       try {
+           // Get Api Key
+           $auth = ApiRest::getApiKey($user, $password);
+           $APIKEY = $auth['api_key'];
+ 
+           // Leer archivo CFDI
+           $file = Storage::disk('Files')->get('cfdi_33.xml');
+          
+           // Convertir Cfdi a Base64
+           $file_64 = base64_encode($file);
+ 
+           // Buscar Acuse
+           $res = Http::withHeaders([
+               'x-api-key' => $APIKEY,
+               'Content-Type' => "application/json"
+           ])->post('https://staging.ws.timbox.com.mx/api/timbrar_cfdi',[
+               'sxml' => $file_64
+           ]);
+           
+           // Respuesta
+           echo $res;
+ 
+       } catch (\Throwable $th) {
+           throw $th;
+       }
+   }
+
+```
+
+
+
